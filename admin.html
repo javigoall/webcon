@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | Ernesto Gutierrez</title>
+    
+    <!-- Importamos Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .admin-nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-cerrar-sesion {
+            background: #DC2626; color: white; border: none; 
+            padding: 8px 16px; border-radius: 8px; font-weight: 700; 
+            font-size: 0.85rem; text-transform: uppercase; cursor: pointer; 
+            transition: background 0.2s; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-cerrar-sesion:hover { background: #B91C1C; }
+
+        .btn-mi-cuenta {
+            background: rgba(255, 255, 255, 0.15);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            padding: 7px 13px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        .btn-mi-cuenta:hover { background: rgba(255, 255, 255, 0.28); }
+
+        .admin-header-actions {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-btn {
+            padding: 12px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, background 0.2s;
+            border: none;
+        }
+        
+        .btn-cargar { background: #10B981; color: white; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); font-size: 1rem; }
+        .btn-cargar:hover { background: #059669; }
+        
+        .btn-banners { background: #3B82F6; color: white; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); }
+        .btn-banners:hover { background: #2563EB; }
+
+        .btn-banners-movil { background: #8B5CF6; color: white; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2); }
+        .btn-banners-movil:hover { background: #7C3AED; }
+        
+        .btn-entregas { background: hsl(27, 100%, 50%); color: white; box-shadow: 0 4px 6px rgba(249, 115, 22, 0.2); }
+        .btn-entregas:hover { background: hsl(27, 100%, 45%); }
+
+        .btn-usuarios { background: #0F172A; color: white; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2); }
+        .btn-usuarios:hover { background: #1E293B; }
+
+        .admin-buscador {
+            width: 100%;
+            box-sizing: border-box; 
+            padding: 14px 20px;
+            border: 2px solid #D1D5DB;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
+            margin: 0;
+        }
+        .admin-buscador:focus {
+            border-color: #002DCC;
+            box-shadow: 0 0 0 4px rgba(0, 45, 204, 0.1);
+        }
+
+        /* Ajustes específicos para celular */
+        @media (max-width: 768px) {
+            .admin-nav-container {
+                flex-direction: column !important;
+                gap: 10px !important;
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+            }
+            
+            .btn-cerrar-sesion, .btn-mi-cuenta {
+                font-size: 0.65rem !important; 
+                padding: 6px 12px !important;
+            }
+
+            .admin-header-actions {
+                grid-template-columns: repeat(3, 1fr) !important; 
+                gap: 8px !important;
+            }
+            
+            .admin-btn {
+                padding: 10px 4px;
+                font-size: 0.72rem;
+                text-align: center;
+                flex-direction: column; 
+                gap: 4px;
+            }
+            
+            .btn-cargar {
+                font-size: 0.85rem;
+                grid-column: span 3 !important; 
+                flex-direction: row; 
+            }
+            
+            .admin-buscador {
+                padding: 12px 15px;
+                font-size: 0.95rem;
+            }
+
+            #grilla-admin .detalles-auto div,
+            #grilla-admin .detalles-auto span,
+            #grilla-admin .precio {
+                white-space: normal !important; 
+                word-wrap: break-word !important;
+                font-size: 0.72rem !important;
+                line-height: 1.2 !important;
+            }
+            
+            #grilla-admin .detalles-auto button {
+                font-size: 0.7rem !important;
+                padding: 8px 4px !important;
+                margin-top: 5px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+        }
+    </style>
+</head>
+<body style="background-color: #F3F4F6;">
+
+    <!-- BARRA DE NAVEGACIÓN DEL PANEL -->
+    <nav class="navbar">
+        <div class="contenedor admin-nav-container">
+            <div style="display: flex; align-items: center; gap: 10px; justify-content: center; cursor: pointer;" onclick="window.open('index.html', '_blank');" title="Ir a la página web">
+                <img src="img/logo-ernesto.png" alt="Logo" style="height: 45px; object-fit: contain;">
+                <span style="font-size: 1.1rem; font-weight: 700; color: #FF9A26; letter-spacing: 0.5px;">ADMIN</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <span id="usuario-logueado-badge" style="display: none; font-size: 0.85rem; color: #FFFFFF; font-weight: 700;"></span>
+                <button id="btn-abrir-mi-cuenta" class="btn-mi-cuenta" style="display: none;">
+                    🔐 Mi Clave / Correo
+                </button>
+                <button id="btn-cerrar-sesion" class="btn-cerrar-sesion" style="display: none;">
+                    CERRAR SESIÓN
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. PANTALLA DE LOGIN Y RECUPERACIÓN -->
+    <main id="pantalla-login" class="contenedor" style="max-width: 420px; margin-top: 55px; margin-bottom: 60px;">
+        <div class="tarjeta-auto" style="padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            
+            <!-- CAJA INICIAR SESIÓN (SOLO USUARIO Y CONTRASEÑA) -->
+            <div id="caja-login">
+                <div style="text-align: center; margin-bottom: 22px;">
+                    <h2 style="margin: 0; color: #002DCC; font-size: 1.75rem;">Acceso al Panel</h2>
+                    <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 0.9rem;">Gestión exclusiva de la concesionaria</p>
+                </div>
+                
+                <form id="form-login">
+                    <div class="grupo-form">
+                        <label>Nombre de Usuario</label>
+                        <input type="text" id="login-username" required placeholder="Ingresá tu usuario" autocomplete="username">
+                    </div>
+                    <div class="grupo-form">
+                        <label>Contraseña</label>
+                        <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                    <button type="submit" id="btn-submit-login" class="btn-primario" style="width: 100%; font-size: 1.05rem; padding: 14px;">Ingresar al Sistema</button>
+                    
+                    <p id="login-error" style="color: #EF4444; font-size: 0.9rem; display: none; text-align: center; font-weight: bold; margin-top: 15px;"></p>
+                    
+                    <div style="text-align: center; margin-top: 18px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                        <a href="#" id="link-mostrar-recuperar" style="color: #2563EB; text-decoration: none; font-size: 0.9rem; font-weight: 600;">¿Olvidaste tu contraseña?</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- CAJA DE RECUPERAR CONTRASEÑA (POR USUARIO O MAIL) -->
+            <div id="caja-recuperar" style="display: none;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #002DCC; font-size: 1.65rem;">Recuperar Contraseña</h2>
+                    <p style="margin: 6px 0 0 0; color: #6B7280; font-size: 0.88rem; line-height: 1.4;">Ingresá tu <strong>nombre de usuario</strong> o tu <strong>correo electrónico</strong> para enviarte el enlace de restablecimiento</p>
+                </div>
+
+                <form id="form-recuperar">
+                    <div class="grupo-form">
+                        <label>Usuario o Correo Electrónico</label>
+                        <input type="text" id="rec-identificador" required placeholder="Tu usuario o tu@correo.com">
+                    </div>
+                    <button type="submit" id="btn-submit-recuperar" class="btn-primario" style="width: 100%; font-size: 1.05rem; padding: 14px;">Enviar Correo de Recuperación</button>
+                    
+                    <p id="rec-mensaje" style="font-size: 0.9rem; display: none; text-align: center; font-weight: bold; margin-top: 15px; line-height: 1.4;"></p>
+
+                    <div style="text-align: center; margin-top: 18px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                        <a href="#" id="link-volver-login" style="color: #6B7280; text-decoration: none; font-size: 0.9rem; font-weight: 600;">← Volver al inicio de sesión</a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 2. PANTALLA OBLIGATORIA EN EL PRIMER INGRESO (CAMBIAR CLAVE PROVISORIA + VINCULAR MAIL) -->
+    <main id="pantalla-config-inicial" class="contenedor" style="display: none; max-width: 480px; margin-top: 45px; margin-bottom: 60px;">
+        <div class="tarjeta-auto" style="padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border-top: 5px solid #002DCC;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="background: #EFF6FF; color: #002DCC; font-weight: 800; font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; letter-spacing: 0.5px;">SEGURIDAD Y PRIVACIDAD</span>
+                <h2 style="margin: 10px 0 5px 0; color: #1F2937; font-size: 1.6rem;">Configurá tu Cuenta</h2>
+                <p style="margin: 0; color: #4B5563; font-size: 0.88rem; line-height: 1.5;">
+                    Ingresaste con una clave provisoria. Por tu seguridad, elegí ahora tu <strong>propia contraseña privada</strong> (nadie más tendrá acceso a ella) y vinculá tu <strong>correo personal</strong> por si algún día necesitás recuperarla.
+                </p>
+            </div>
+
+            <form id="form-config-inicial">
+                <div class="grupo-form">
+                    <label>Tu Correo Electrónico de Recuperación *</label>
+                    <input type="email" id="config-email" required placeholder="ejemplo@correo.com">
+                </div>
+                <div class="grupo-form">
+                    <label>Nueva Contraseña Privada * (Mín. 6 caracteres)</label>
+                    <input type="password" id="config-password" required minlength="6" placeholder="Escribí tu nueva clave privada">
+                </div>
+                <div class="grupo-form">
+                    <label>Repetir Nueva Contraseña *</label>
+                    <input type="password" id="config-password-repeat" required minlength="6" placeholder="Repetí tu nueva clave">
+                </div>
+
+                <button type="submit" id="btn-submit-config" class="btn-primario" style="width: 100%; font-size: 1.05rem; padding: 14px; background: #10B981;">
+                    🔒 Guardar mi Clave y Entrar al Panel
+                </button>
+                <p id="config-error" style="color: #EF4444; font-size: 0.9rem; display: none; text-align: center; font-weight: bold; margin-top: 15px;"></p>
+            </form>
+        </div>
+    </main>
+
+    <!-- 3. PANTALLA PARA RESTABLECER LA CONTRASEÑA (Viniendo desde el link del mail) -->
+    <main id="pantalla-nueva-pass" class="contenedor" style="display: none; max-width: 420px; margin-top: 60px; margin-bottom: 60px;">
+        <div class="tarjeta-auto" style="padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #002DCC; font-size: 1.75rem;">Nueva Contraseña</h2>
+                <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 0.9rem;">Escribí tu nueva clave privada de acceso</p>
+            </div>
+            <form id="form-nueva-pass">
+                <div class="grupo-form">
+                    <label>Nueva Contraseña</label>
+                    <input type="password" id="nueva-password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="grupo-form">
+                    <label>Repetir Nueva Contraseña</label>
+                    <input type="password" id="nueva-password-repeat" required minlength="6" placeholder="Repetí la contraseña">
+                </div>
+                <button type="submit" id="btn-submit-nueva-pass" class="btn-primario" style="width: 100%; font-size: 1.05rem; padding: 14px;">Actualizar Contraseña</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- 4. PANTALLA PRINCIPAL DEL PANEL -->
+    <main id="pantalla-panel" class="contenedor" style="display: none; margin-top: 30px; margin-bottom: 80px; max-width: 1050px;">
+        
+        <!-- Botonera de Acción -->
+        <div class="admin-header-actions" id="botonera-acciones-admin">
+            <button id="btn-nuevo-auto" class="admin-btn btn-cargar">
+                <span style="font-size: 1.3rem; line-height: 1;">+</span> Nuevo vehículo
+            </button>
+            <button id="btn-abrir-entregas" class="admin-btn btn-entregas">
+                <span style="font-size: 1.1rem; line-height: 1;">📸</span> Entregas
+            </button>
+            <button id="btn-abrir-banners" class="admin-btn btn-banners">
+                <span style="font-size: 1.1rem; line-height: 1;">💻</span> Banner PC
+            </button>
+            <button id="btn-abrir-banners-movil" class="admin-btn btn-banners-movil">
+                <span style="font-size: 1.1rem; line-height: 1;">📱</span> Banner Cel
+            </button>
+            <button id="btn-abrir-usuarios" class="admin-btn btn-usuarios" style="display: none;">
+                <span style="font-size: 1.1rem; line-height: 1;">👥</span> Usuarios
+            </button>
+            
+            <select id="select-tiempo-carrusel" class="admin-btn" style="background: #E5E7EB; color: #1F2937; border: none; cursor: pointer; outline: none; padding: 0 5px;">
+                <option value="2000">⏱️ 2 Seg</option>
+                <option value="4000" selected>⏱️ 4 Seg</option>
+                <option value="6000">⏱️ 6 Seg</option>
+                <option value="8000">⏱️ 8 Seg</option>
+            </select>
+        </div>
+        
+        <!-- Buscador Inteligente -->
+        <div style="margin-bottom: 30px; width: 100%; box-sizing: border-box;">
+            <input type="text" id="buscador-admin" class="admin-buscador" placeholder="🔍 Buscar por marca, modelo, año o precio...">
+        </div>
+        
+        <!-- TÍTULO Y BOTÓN DE VISTA LISTA -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E5E7EB; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="color: #1F2937; margin: 0;">Mi Catálogo Activo</h2>
+            <button id="btn-cambiar-vista" class="btn-secundario" style="display: flex; align-items: center; gap: 8px; padding: 8px 15px; font-weight: bold; font-size: 0.95rem;">
+                📄 Ver en Lista
+            </button>
+        </div>
+
+        <div id="grilla-admin" class="catalogo-grid">
+            <p style="text-align: center; padding: 40px; color: #6B7280; font-size: 1.1rem; grid-column: 1/-1;">Cargando tu stock...</p>
+        </div>
+    </main>
+
+    <!-- MODAL: MI CUENTA (CAMBIAR CONTRASEÑA O CORREO DE RECUPERACIÓN EN CUALQUIER MOMENTO) -->
+    <div id="modal-mi-cuenta" class="modal-fondo" style="display: none;">
+        <div class="modal-contenido tarjeta-auto" style="max-width: 460px; padding: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #002DCC; font-size: 1.4rem;">🔐 Mi Cuenta y Seguridad</h2>
+                <button onclick="document.getElementById('modal-mi-cuenta').style.display='none'" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6B7280;">&times;</button>
+            </div>
+
+            <form id="form-mi-cuenta">
+                <div class="grupo-form">
+                    <label>Nombre de Usuario</label>
+                    <input type="text" id="mi-cuenta-username" disabled style="background: #F3F4F6; color: #6B7280; font-weight: bold;">
+                </div>
+                <div class="grupo-form">
+                    <label>Correo de Recuperación *</label>
+                    <input type="email" id="mi-cuenta-email" required placeholder="tu@correo.com">
+                </div>
+                <div class="grupo-form">
+                    <label>Nueva Contraseña (dejar en blanco para no cambiarla)</label>
+                    <input type="password" id="mi-cuenta-pass" minlength="6" placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="grupo-form">
+                    <label>Repetir Nueva Contraseña</label>
+                    <input type="password" id="mi-cuenta-pass-repeat" minlength="6" placeholder="Repetí la nueva contraseña">
+                </div>
+
+                <button type="submit" id="btn-guardar-mi-cuenta" class="btn-primario" style="width: 100%; padding: 13px; font-size: 1rem;">💾 Guardar Cambios</button>
+                <p id="mi-cuenta-msj" style="display: none; text-align: center; font-weight: bold; font-size: 0.9rem; margin-top: 12px;"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: GESTIÓN DE USUARIOS DEL DUEÑO (HASTA 2 USUARIOS ADICIONALES) -->
+    <div id="modal-usuarios" class="modal-fondo" style="display: none;">
+        <div class="modal-contenido tarjeta-auto" style="max-width: 680px; padding: 25px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px; margin-bottom: 18px;">
+                <div>
+                    <h2 style="margin: 0; color: #0F172A; font-family: 'Poppins', sans-serif; font-size: 1.45rem;">👥 Usuarios del Panel</h2>
+                    <p style="margin: 4px 0 0 0; color: #6B7280; font-size: 0.85rem;">Podés habilitar hasta <strong>2 usuarios adicionales</strong> para tu equipo</p>
+                </div>
+                <button onclick="document.getElementById('modal-usuarios').style.display='none'" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6B7280;">&times;</button>
+            </div>
+            
+            <!-- Lista de usuarios actuales -->
+            <div id="lista-usuarios-admin" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px;">
+                <p>Cargando usuarios...</p>
+            </div>
+
+            <!-- Formulario para agregar hasta 2 usuarios -->
+            <div id="caja-nuevo-usuario-adicional" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 18px;">
+                <h3 style="margin: 0 0 6px 0; font-size: 1.05rem; color: #002DCC;">➕ Crear Usuario Adicional</h3>
+                <p style="margin: 0 0 14px 0; font-size: 0.82rem; color: #6B7280;">
+                    Asignale un usuario y una contraseña provisoria. Cuando esa persona ingrese por primera vez, el sistema le pedirá que elija su propia clave privada y su correo.
+                </p>
+
+                <form id="form-crear-usuario-adicional" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end;">
+                    <div class="grupo-form" style="margin: 0;">
+                        <label>Nombre de Usuario *</label>
+                        <input type="text" id="nuevo-user-username" required placeholder="Ej: vendedor1" pattern="^[a-zA-Z0-9_.-]+$" title="Sin espacios">
+                    </div>
+                    <div class="grupo-form" style="margin: 0;">
+                        <label>Clave Provisoria *</label>
+                        <input type="text" id="nuevo-user-password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <button type="submit" id="btn-submit-user-adicional" class="btn-primario" style="background: #10B981; padding: 12px;">
+                        Crear Usuario
+                    </button>
+                </form>
+                <p id="msj-user-adicional" style="display: none; font-size: 0.88rem; font-weight: bold; margin: 12px 0 0 0; text-align: center;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LISTADO DE ENTREGAS -->
+    <div id="modal-ver-entregas" class="modal-fondo" style="display: none;">
+        <div class="modal-contenido tarjeta-auto" style="max-width: 900px; padding: 25px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: hsl(27, 100%, 50%); font-family: 'Poppins', sans-serif;">📸 Gestión de Entregas</h2>
+                <button onclick="document.getElementById('modal-ver-entregas').style.display='none'" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6B7280;">&times;</button>
+            </div>
+            
+            <button id="btn-nueva-entrega" class="btn-primario" style="background: hsl(27, 100%, 50%); margin-bottom: 20px; width: 100%;">+ Cargar Nueva Entrega / Cliente</button>
+            
+            <div id="lista-entregas-admin" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                <p>Cargando entregas...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORMULARIO CARGAR/EDITAR ENTREGA -->
+    <div id="modal-form-entrega" class="modal-fondo" style="display: none; z-index: 1001;">
+        <div class="modal-contenido tarjeta-auto" style="max-width: 500px; padding: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 id="titulo-modal-entrega" style="margin: 0; color: #002DCC;">Nueva Entrega</h2>
+                <button onclick="document.getElementById('modal-form-entrega').style.display='none'" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6B7280;">&times;</button>
+            </div>
+            
+            <form id="form-cargar-entrega">
+                <input type="hidden" id="entrega-id-oculto" value="">
+                
+                <div class="grupo-form">
+                    <label>Título (Ej: Familia Gómez - Fiat Cronos) *</label>
+                    <input type="text" id="entrega-titulo" required>
+                </div>
+
+                <div class="grupo-form">
+                    <label>Foto de la entrega *</label>
+                    <input type="file" id="entrega-foto" accept="image/*" style="border: 1px solid #D1D5DB; padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                    <p id="entrega-foto-ayuda" style="font-size: 0.8rem; color: #6B7280; display: none;">Dejá vacío si no querés cambiar la foto actual.</p>
+                </div>
+
+                <div class="grupo-form">
+                    <label>Fecha de entrega (Opcional)</label>
+                    <input type="date" id="entrega-fecha">
+                </div>
+
+                <div class="grupo-form">
+                    <label>Descripción o testimonio (Opcional)</label>
+                    <textarea id="entrega-descripcion" rows="3" placeholder="Ej: Gracias por confiar en nosotros..."></textarea>
+                </div>
+
+                <button type="submit" id="btn-guardar-entrega" class="btn-primario" style="width: 100%; background: hsl(27, 100%, 50%); padding: 14px; font-size: 1.1rem;">💾 Guardar Entrega</button>
+                <p id="msj-carga-entrega" style="text-align: center; color: #2563EB; font-weight: bold; display: none; margin-top: 15px;">⏳ Subiendo foto y guardando...</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE GESTIÓN DE BANNERS -->
+    <div id="modal-banners" class="modal-fondo" style="display: none;">
+        <div class="modal-contenido tarjeta-auto" style="max-width: 600px; padding: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 id="titulo-modal-banners" style="margin: 0; color: #002DCC;">Banners del Carrusel</h2>
+                <button id="btn-cerrar-modal-banners" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6B7280;">&times;</button>
+            </div>
+
+            <p id="texto-modal-banners" style="color: #6B7280; font-size: 0.95rem; margin-top: 0; line-height: 1.5;">
+                Cargando información...
+            </p>
+
+            <div id="lista-banners-admin" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                <p>Cargando banners...</p>
+            </div>
+
+            <div id="contenedor-subir-banner" style="border-top: 1px solid #E5E7EB; padding-top: 20px;">
+                <input type="file" id="input-archivo-banner" accept="image/*" style="display: none;">
+                <button type="button" id="btn-subir-banner" style="width: 100%; background: #EFF6FF; color: #3B82F6; border: 2px dashed #3B82F6; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.05rem;">
+                    ➕ Agregar Imagen al Carrusel
+                </button>
+                <p id="msj-subiendo-banner" style="display: none; text-align: center; color: #2563EB; font-weight: bold; margin-top: 15px;">⏳ Subiendo y guardando imagen...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARGAR / EDITAR VEHÍCULO -->
+    <div id="modal-nuevo-auto" class="modal-fondo" style="display: none;">
+        <div class="modal-contenido tarjeta-auto" style="max-width: 800px; padding: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 15px; margin-bottom: 20px;">
+                <h2 id="titulo-modal" style="margin: 0; color: #002DCC;">Cargar Nuevo Vehículo</h2>
+                <button id="btn-cerrar-modal" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6B7280;">&times;</button>
+            </div>
+            
+            <form id="form-cargar-auto">
+                <input type="hidden" id="auto-id-oculto" value="">
+                
+                <!-- BLOQUE 1: FOTOS -->
+                <div style="background: #F9FAFB; padding: 15px; border-radius: 8px; border: 1px solid #E5E7EB; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; font-size: 1.1rem; color: #374151;">1. Galería de Fotos</h3>
+                    
+                    <div id="contenedor-fotos-existentes" style="display: none; margin-bottom: 15px;">
+                        <label style="font-size: 0.85rem; color: #6B7280; font-weight: bold;">FOTOS ACTUALES (Clic en ❌ para borrar)</label>
+                        <div id="galeria-edicion" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px;"></div>
+                    </div>
+
+                    <button type="button" id="btn-seleccionar-fotos" style="width: 100%; border: 2px dashed #9CA3AF; color: #4B5563; background: #FFFFFF; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+                        📸 Seleccionar Fotos (Máx. 10)
+                    </button>
+                    <input type="file" id="auto-foto" accept="image/*" multiple style="display: none;">
+                    
+                    <div id="preview-nuevas-fotos" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+                </div>
+
+                <!-- BLOQUE 2: DATOS -->
+                <div style="background: #F9FAFB; padding: 15px; border-radius: 8px; border: 1px solid #E5E7EB; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; font-size: 1.1rem; color: #374151;">2. Datos Técnicos</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Marca</label>
+                            <select id="auto-marca" required style="background: white;">
+                                <option value="">Seleccioná...</option>
+                                <option value="Audi">Audi</option>
+                                <option value="Chevrolet">Chevrolet</option>
+                                <option value="Fiat">Fiat</option>
+                                <option value="Ford">Ford</option>
+                                <option value="Jeep">Jeep</option>
+                                <option value="Nissan">Nissan</option>
+                                <option value="Peugeot">Peugeot</option>
+                                <option value="Renault">Renault</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Volkswagen">Volkswagen</option>
+                                <option value="Otra">Otra...</option>
+                            </select>
+                            <input type="text" id="auto-marca-manual" placeholder="Escribí la marca..." style="display: none; margin-top: 10px;">
+                        </div>
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Modelo</label>
+                            <input type="text" id="auto-modelo" required placeholder="Ej: Hilux">
+                        </div>
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Versión</label>
+                            <input type="text" id="auto-version" required placeholder="Ej: 2.8 SRV">
+                        </div>
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Año</label>
+                            <input type="number" id="auto-anio" required placeholder="Ej: 2018">
+                        </div>
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Kilómetros</label>
+                            <input type="number" id="auto-km" placeholder="Ej: 120000">
+                        </div>
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Combustible</label>
+                            <select id="auto-combustible" required style="background: white;">
+                                <option value="Nafta">Nafta</option>
+                                <option value="Nafta/GNC">Nafta/GNC</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Electrico">Eléctrico</option>
+                                <option value="Hibrido">Híbrido</option>
+                            </select>
+                        </div>
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Transmisión</label>
+                            <select id="auto-transmision" required style="background: white;">
+                                <option value="Manual">Manual</option>
+                                <option value="Automática">Automática</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 3: VENTAS Y PRECIO -->
+                <div style="background: #FFFBEB; padding: 15px; border-radius: 8px; border: 1px solid #FDE68A; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; font-size: 1.1rem; color: #D97706;">3. Venta y Precios</h3>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px; background: white; padding: 12px; border-radius: 6px; border: 1px solid #E5E7EB;">
+                        <input type="checkbox" id="check-oferta" style="width: 20px; height: 20px; accent-color: #D97706;">
+                        <label for="check-oferta" style="margin: 0; color: #D97706; font-weight: bold; cursor: pointer; font-size: 1.05rem;">🔥 Marcar vehículo en oportunidad</label>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: white; padding: 12px; border-radius: 6px; border: 1px solid #E5E7EB;">
+                        <input type="checkbox" id="check-novedad" style="width: 20px; height: 20px; accent-color: #65A30D;">
+                        <label for="check-novedad" style="margin: 0; color: #4D7C0F; font-weight: bold; cursor: pointer; font-size: 1.05rem;">🌿 Vehículo en novedad</label>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 100px 1fr; gap: 10px; margin-bottom: 15px;">
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Moneda</label>
+                            <select id="auto-moneda" required style="background: white;">
+                                <option value="ARS">AR$</option>
+                                <option value="USD">U$S</option>
+                            </select>
+                        </div>
+                        <div class="grupo-form" style="margin-bottom: 0;">
+                            <label>Precio Contado (Opcional)</label>
+                            <input type="number" id="auto-precio" placeholder="Ej: 15000000">
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px dashed #FCD34D; padding-top: 15px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 10px;">
+                            <input type="checkbox" id="check-cuotas" style="width: 18px; height: 18px;">
+                            <strong style="color: #4B5563;">Habilitar Financiación / Cuotas</strong>
+                        </label>
+                        
+                        <div id="contenedor-cuotas-inputs" style="display: none; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; background: white; padding: 15px; border-radius: 6px; border: 1px solid #E5E7EB;">
+                            <div class="grupo-form" style="margin:0;">
+                                <label>Entrega Mínima</label>
+                                <input type="number" id="auto-entrega" placeholder="Ej: 5000000">
+                            </div>
+                            <div class="grupo-form" style="margin:0;">
+                                <label>Cant. Cuotas</label>
+                                <input type="number" id="auto-cant-cuotas" placeholder="Ej: 12">
+                            </div>
+                            <div class="grupo-form" style="margin:0;">
+                                <label>Monto Cuota</label>
+                                <input type="number" id="auto-monto-cuota" placeholder="Ej: 450000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 4: DESCRIPCIÓN -->
+                <div class="grupo-form" style="background: #F9FAFB; padding: 15px; border-radius: 8px; border: 1px solid #E5E7EB;">
+                    <label style="font-size: 1.1rem; color: #374151; margin-bottom: 10px;">4. Descripción detallada</label>
+                    <textarea id="auto-descripcion" rows="4" placeholder="Ej: Único dueño, service al día, cubiertas nuevas..." style="background: white;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button type="button" class="btn-secundario" onclick="document.getElementById('btn-cerrar-modal').click()" style="flex: 1; padding: 14px;">Cancelar</button>
+                    <button type="submit" id="btn-guardar-auto" class="btn-primario" style="flex: 2; padding: 14px; font-size: 1.1rem;">💾 Guardar Vehículo</button>
+                </div>
+                <p id="mensaje-carga" style="text-align: center; color: #2563EB; font-weight: bold; display: none; margin-top: 15px; font-size: 1.1rem;">⏳ Procesando imágenes y guardando...</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DEL BUSCADOR EN TIEMPO REAL -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buscador = document.getElementById('buscador-admin');
+            
+            if (buscador) {
+                buscador.addEventListener('input', function(e) {
+                    const texto = e.target.value.toLowerCase().trim();
+                    const tarjetas = document.querySelectorAll('#grilla-admin .tarjeta-auto');
+                    
+                    tarjetas.forEach(tarjeta => {
+                        const contenidoTarjeta = tarjeta.innerText.toLowerCase();
+                        if (contenidoTarjeta.includes(texto)) {
+                            tarjeta.style.display = '';
+                        } else {
+                            tarjeta.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

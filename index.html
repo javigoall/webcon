@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo | Ernesto Gutierrez Automotores</title>
+    
+    <!-- Metadatos para compartir en Redes Sociales -->
+    <meta property="og:title" content="Catálogo | Ernesto Gutierrez Automotores">
+    <meta property="og:description" content="Encontrá tu próximo vehículo. Calidad, confianza y la mejor financiación del mercado.">
+    <meta property="og:image" content="https://blblkcalqkdkbxocbrfo.supabase.co/storage/v1/object/public/fotos_vehiculos/tarjeta.png">
+    <meta property="og:type" content="website">
+
+    <!-- Importamos Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- BARRA DE NAVEGACIÓN -->
+    <nav class="navbar">
+        <div class="contenedor nav-container">
+            
+            <div style="display: flex; align-items: center; cursor: pointer;" onclick="window.location.href='index.html';">
+                <img src="img/logo-ernesto.png" alt="Logo Ernesto Gutierrez" style="height: 46px; width: auto; object-fit: contain;">
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="#" onclick="document.getElementById('seccion-ofertas').scrollIntoView({ behavior: 'smooth' }); return false;" style="color: #FF9A26; font-weight: 800;">OPORTUNIDADES</a></li>
+                <li><a href="#" onclick="document.getElementById('seccion-novedades').scrollIntoView({ behavior: 'smooth' }); return false;">NOVEDADES</a></li>
+                <li><a href="#" onclick="filtrarPorEstado('0km'); return false;">0 KM</a></li>
+                <li><a href="#" onclick="filtrarPorEstado('usados'); return false;">USADOS</a></li>
+                <li><a href="nosotros.html">¿QUIÉNES SOMOS?</a></li>
+                <li><a href="clientes.html">CLIENTES</a></li>
+                <li><a href="#footer-contacto">CONTACTO</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- CARRUSEL PC -->
+    <div class="contenedor-carrusel-pc">
+        <div class="carrusel carrusel-pc">
+            <div class="carrusel-slides" id="carrusel-slides-pc"></div>
+            <button class="carrusel-btn btn-prev" onclick="moverCarruselIndex(-1, 'pc')">&#10094;</button>
+            <button class="carrusel-btn btn-next" onclick="moverCarruselIndex(1, 'pc')">&#10095;</button>
+            <div class="carrusel-indicadores" id="carrusel-indicadores-pc"></div>
+        </div>
+    </div>
+
+    <!-- CARRUSEL MÓVIL -->
+    <div class="contenedor-carrusel-movil">
+        <div class="carrusel carrusel-movil">
+            <div class="carrusel-slides" id="carrusel-slides-movil"></div>
+            <button class="carrusel-btn btn-prev" onclick="moverCarruselIndex(-1, 'movil')">&#10094;</button>
+            <button class="carrusel-btn btn-next" onclick="moverCarruselIndex(1, 'movil')">&#10095;</button>
+            <div class="carrusel-indicadores" id="carrusel-indicadores-movil"></div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE TEXTO Y LOGOS -->
+    <section class="seccion-marcas contenedor">
+        <h2 class="titulo-marcas">Somos el concesionario multimarcas más grande de todo Santiago del Estero</h2>
+        
+        <div class="logos-marcas">
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/volkswagen/white" alt="Volkswagen"></div>
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/ford/white" alt="Ford"></div>
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/renault/white" alt="Renault"></div>
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/fiat/white" alt="Fiat"></div>
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/peugeot/white" alt="Peugeot"></div>
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/toyota/white" alt="Toyota"></div>
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/nissan/white" alt="Nissan"></div>
+            <div class="logo-circulo"><img src="https://cdn.simpleicons.org/chevrolet/white" alt="Chevrolet"></div>
+        </div>
+    </section>
+
+    <main class="contenedor" style="margin-top: 0; margin-bottom: 60px;">
+        
+        <!-- SECCIÓN OPORTUNIDADES -->
+        <div id="seccion-ofertas" style="display: none; margin-bottom: 25px;">
+            <h2 style="color: hsl(27, 100%, 50%); font-size: 2.2rem; font-family: 'Poppins', sans-serif; font-weight: 800; text-align: center; margin-bottom: 20px; letter-spacing: -1px;">OPORTUNIDADES</h2>
+            <div id="grilla-ofertas" class="ofertas-grid"></div>
+        </div>
+
+        <!-- SECCIÓN NOVEDADES -->
+        <div id="seccion-novedades" style="display: none; margin-bottom: 25px;">
+            <h2 style="color: #4D7C0F; font-size: 2.2rem; font-family: 'Poppins', sans-serif; font-weight: 800; text-align: center; margin-bottom: 20px; letter-spacing: -1px;">NOVEDADES</h2>
+            <div id="grilla-novedades" class="ofertas-grid"></div>
+        </div>
+
+        <h2 id="titulo-filtro" style="color: #002DCC; font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 700; text-align: center; margin-top: 35px; margin-bottom: 20px;">Nuestro catálogo de vehículos</h2>
+
+        <!-- CAJA DE BUSCADOR Y FILTROS -->
+        <div class="filtros-contenedor" id="seccion-inventario">
+            <input type="text" id="buscador-texto" placeholder="Buscar por modelo o versión">
+            <select id="filtro-marca">
+                <option value="">Todas las marcas</option>
+            </select>
+        </div>
+
+        <!-- GRILLA DE VEHÍCULOS NORMALES -->
+        <div id="grilla-vehiculos" class="catalogo-grid">
+            <p style="text-align:center; grid-column: 1 / -1; padding: 40px;">Cargando inventario...</p>
+        </div>
+
+        <!-- BOTONES FLOTANTES DE REDES SOCIALES -->
+        <div class="redes-flotantes">
+            <a href="https://wa.me/5491100000000" target="_blank" class="btn-flotante whatsapp">
+                <img src="https://cdn.simpleicons.org/whatsapp/white" alt="WhatsApp">
+            </a>
+            <a href="https://instagram.com/" target="_blank" class="btn-flotante instagram">
+                <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram">
+            </a>
+            <a href="https://facebook.com/" target="_blank" class="btn-flotante facebook">
+                <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook">
+            </a>
+        </div>
+    </main>
+
+    <!-- FOOTER / PIE DE PÁGINA -->
+    <footer class="footer" id="footer-contacto">
+        <div class="contenedor footer-grid">
+            <div class="footer-columna">
+                <h3>Ernesto Gutierrez</h3>
+                <p>Tu próximo vehículo te está esperando. Calidad, confianza y la mejor financiación del mercado para que te lleves la llave hoy mismo.</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Contacto Directo</h3>
+                <p>📍 Av. Belgrano Sur 1234, Ciudad</p>
+                <p>📱 WhatsApp: +54 9 11 0000-0000</p>
+                <p>✉️ ventas@goall.com.ar</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Horarios de Atención</h3>
+                <p>Lunes a Viernes: 09:00 a 13:00 y 17:00 a 20:30 hs</p>
+                <p>Sábados: 09:00 a 13:00 hs</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Redes Sociales</h3>
+                <a href="https://facebook.com" target="_blank" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; margin-bottom: 15px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook" style="width: 22px; height: 22px; object-fit: contain;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Facebook</span>
+                </a>
+                <a href="https://instagram.com" target="_blank" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; margin-bottom: 15px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram" style="width: 22px; height: 22px; object-fit: contain;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Instagram</span>
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ernesto Gutierrez. Todos los derechos reservados. Desarrollado por Goall Web Solutions.</p>
+        </div>
+    </footer>
+
+    <script src="js/supabase-config.js"></script>
+    
+    <script>
+        let slideIndexPC = 0; 
+        let slideIndexMovil = 0;
+        let totalPC = 0; 
+        let totalMovil = 0;
+        let intervaloTiempo = 4000;
+
+        async function cargarBannersDuales() {
+            try {
+                const { data: config } = await clienteSupabase.from('configuracion').select('tiempo').limit(1).maybeSingle();
+                if (config && config.tiempo) {
+                    intervaloTiempo = config.tiempo;
+                }
+
+                const { data: banners, error } = await clienteSupabase
+                    .from('banners')
+                    .select('*')
+                    .order('orden', { ascending: true });
+                
+                if (error || !banners) return;
+
+                const bPC = banners.filter(b => b.tipo === 'pc' || !b.tipo);
+                const bMovil = banners.filter(b => b.tipo === 'movil');
+                
+                totalPC = bPC.length; 
+                totalMovil = bMovil.length;
+
+                renderizarHtmlCarrusel('pc', bPC);
+                renderizarHtmlCarrusel('movil', bMovil);
+
+                setInterval(() => { 
+                    if(totalPC > 1) moverCarruselIndex(1, 'pc'); 
+                    if(totalMovil > 1) moverCarruselIndex(1, 'movil'); 
+                }, intervaloTiempo);
+
+            } catch (e) { 
+                console.error("Error cargando banners", e); 
+            }
+        }
+
+        function renderizarHtmlCarrusel(tipo, arrayBanners) {
+            const slidesContainer = document.getElementById(`carrusel-slides-${tipo}`);
+            const indContainer = document.getElementById(`carrusel-indicadores-${tipo}`);
+            const carruselPadre = slidesContainer ? slidesContainer.parentElement : null;
+            
+            if(!slidesContainer || arrayBanners.length === 0) {
+                if(carruselPadre) carruselPadre.style.display = 'none';
+                return;
+            }
+            
+            let htmlSlides = ''; 
+            let htmlInd = '';
+            
+            arrayBanners.forEach((b, i) => {
+                htmlSlides += `<div class="slide"><img src="${b.url_imagen}"></div>`;
+                htmlInd += `<div class="indicador ${i===0?'activo':''}" onclick="irAIndex(${i}, '${tipo}')"></div>`;
+            });
+            
+            slidesContainer.innerHTML = htmlSlides;
+            if(indContainer) indContainer.innerHTML = htmlInd;
+
+            if(arrayBanners.length === 1 && carruselPadre) {
+                const btnPrev = carruselPadre.querySelector('.btn-prev');
+                const btnNext = carruselPadre.querySelector('.btn-next');
+                if(btnPrev) btnPrev.style.display = 'none';
+                if(btnNext) btnNext.style.display = 'none';
+                if(indContainer) indContainer.style.display = 'none';
+            }
+        }
+
+        function moverCarruselIndex(dir, tipo) {
+            if(tipo === 'pc' && totalPC > 1) { 
+                slideIndexPC = (slideIndexPC + dir + totalPC) % totalPC; 
+                irAIndex(slideIndexPC, 'pc'); 
+            }
+            if(tipo === 'movil' && totalMovil > 1) { 
+                slideIndexMovil = (slideIndexMovil + dir + totalMovil) % totalMovil; 
+                irAIndex(slideIndexMovil, 'movil'); 
+            }
+        }
+
+        function irAIndex(index, tipo) {
+            if(tipo === 'pc') slideIndexPC = index; 
+            if(tipo === 'movil') slideIndexMovil = index;
+            
+            const slidesContainer = document.getElementById(`carrusel-slides-${tipo}`);
+            const indContainer = document.getElementById(`carrusel-indicadores-${tipo}`);
+            
+            if(slidesContainer) slidesContainer.style.transform = `translateX(-${index * 100}%)`;
+            if(indContainer) {
+                Array.from(indContainer.children).forEach((d, i) => { 
+                    d.classList.toggle('activo', i === index); 
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarBannersDuales);
+    </script>
+    
+    <script src="js/app.js"></script>
+</body>
+</html>
