@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiénes Somos | Todo Camionetas</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .header-nosotros {
+            background: linear-gradient(rgba(220, 38, 38, 0.8), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1554558237-7756f710352f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header-nosotros h1 { font-size: 3.5rem; margin: 0; font-weight: 800; letter-spacing: -1px; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .header-nosotros p { font-size: 1.2rem; margin-top: 15px; font-weight: 500; opacity: 0.9; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        .historia-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-bottom: 60px; }
+        .historia-texto h2 { color: #111827; font-size: 2.2rem; margin-top: 0; margin-bottom: 20px; letter-spacing: -0.5px; }
+        .historia-texto p { color: #4B5563; font-size: 1.1rem; line-height: 1.7; margin-bottom: 15px; }
+        .historia-imagen img { width: 100%; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+
+        .valores-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 80px; }
+        .tarjeta-valor { background: #FFFFFF; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-top: 4px solid #DC2626; transition: transform 0.3s ease; }
+        .tarjeta-valor:hover { transform: translateY(-5px); }
+        .tarjeta-valor .icono { font-size: 3rem; margin-bottom: 15px; }
+        .tarjeta-valor h3 { color: #1F2937; font-size: 1.3rem; margin-top: 0; margin-bottom: 10px; }
+        .tarjeta-valor p { color: #6B7280; font-size: 0.95rem; line-height: 1.6; margin: 0; }
+
+        @media (max-width: 768px) {
+            .historia-container { grid-template-columns: 1fr; }
+            .valores-grid { grid-template-columns: 1fr; }
+            .header-nosotros h1 { font-size: 2.2rem; }
+        }
+    </style>
+
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="contenedor nav-container">
+            <a href="index.html" style="display: flex; align-items: center; text-decoration: none; cursor: pointer;">
+                <img src="img/logo-todocam.png" alt="Logo Todo Camionetas" style="height: 50px; width: auto; object-fit: contain;">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="index.html#seccion-inventario">0 KM / USADOS</a></li>
+                <li><a href="nosotros.html">¿QUIÉNES SOMOS?</a></li>
+                <li><a href="clientes.html">CLIENTES</a></li>
+                <li><a href="#footer-contacto">CONTACTO</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="header-nosotros">
+        <h1>Nuestra Historia</h1>
+        <p>Expertos en Pick-Ups. De un sueño emprendedor al concesionario exclusivo de confianza en La Banda, Santiago del Estero.</p>
+    </header>
+
+    <main class="contenedor">
+        <section class="historia-container">
+            <div class="historia-texto">
+                <h2>Creciendo a pulmón, junto a vos.</h2>
+                <p><strong>Todo Camionetas</strong> no nació siendo una gran agencia. Comenzamos movidos por la pasión por los motores fuertes y un sueño claro: especializarnos y ayudar a que nuestros vecinos puedan llegar a su primera camioneta para trabajar la tierra, o dar ese salto soñado hacia un modelo de alta gama.</p>
+                <p>Los primeros pasos fueron a puro pulmón. Cada pick-up que ingresaba era revisada, probada y preparada con el mismo cuidado que si fuera para nosotros mismos. Esa dedicación constante nos permitió ir creciendo, ladrillo a ladrillo, gracias al boca a boca y a la recomendación de quienes confiaron en nosotros desde el primer día.</p>
+                <p>Hoy, nos enorgullece ser el único concesionario referente dedicado exclusivamente a camionetas. Acá no vas a encontrar vendedores a presión, sino un equipo humano que te escucha y te asesora para el trabajo o la ruta. <strong>Porque para nosotros, no sos solo un cliente, sos familia.</strong></p>
+            </div>
+            <div class="historia-imagen">
+                <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Camionetas en stock">
+            </div>
+        </section>
+
+        <h2 style="color: #111827; text-align: center; font-size: 2rem; margin-bottom: 40px;">Los pilares de nuestro compromiso</h2>
+        
+        <section class="valores-grid">
+            <div class="tarjeta-valor">
+                <div class="icono">🤝</div>
+                <h3>Sinceridad Absoluta</h3>
+                <p>Te decimos la verdad sobre cada camioneta. Creemos que la transparencia desde el primer saludo es la base para una relación duradera.</p>
+            </div>
+            <div class="tarjeta-valor">
+                <div class="icono">💼</div>
+                <h3>Especialistas en Pick-Ups</h3>
+                <p>Sabemos de fuerza y trabajo. Nuestras camionetas pasan por rigurosos controles mecánicos listas para transferir y poner a prueba.</p>
+            </div>
+            <div class="tarjeta-valor">
+                <div class="icono">👨‍👩‍👧‍👦</div>
+                <h3>Trato Familiar</h3>
+                <p>Comprar un vehículo así es una decisión enorme. Te acompañamos en cada etapa, respondiendo a tus dudas con paciencia y calidez humana.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" id="footer-contacto" style="background: #111827;">
+        <div class="contenedor footer-grid">
+            <div class="footer-columna">
+                <h3>Todo Camionetas</h3>
+                <p>Tu próxima pick-up te está esperando. Calidad, confianza y la mejor financiación del mercado para que te lleves la llave hoy mismo.</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Contacto Directo</h3>
+                <p>📍 Av. Republica del Libano Sur, Ciudad de La Banda</p>
+                <p>📱 WhatsApp: +5438500000</p>
+                <p>✉️ info@todocamionetas.com.ar</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Horarios de Atención</h3>
+                <p>Lunes a Viernes: 09:00 a 13:00 y 17:00 a 20:30 hs</p>
+                <p>Sábados: 09:00 a 13:00 hs</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Redes Sociales</h3>
+                <a href="https://facebook.com" target="_blank" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; margin-bottom: 15px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook" style="width: 22px; height: 22px; object-fit: contain;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Facebook</span>
+                </a>
+                <a href="https://instagram.com" target="_blank" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; margin-bottom: 15px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram" style="width: 22px; height: 22px; object-fit: contain;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Instagram</span>
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Todo Camionetas. Todos los derechos reservados. Desarrollado por Goall Web Solutions.</p>
+        </div>
+    </footer>
+
+    <div class="redes-flotantes">
+        <a href="https://wa.me/5438500000" target="_blank" class="btn-flotante whatsapp">
+            <img src="https://cdn.simpleicons.org/whatsapp/white" alt="WhatsApp">
+        </a>
+        <a href="https://instagram.com/" target="_blank" class="btn-flotante instagram">
+            <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram">
+        </a>
+        <a href="https://facebook.com/" target="_blank" class="btn-flotante facebook">
+            <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook">
+        </a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestros Clientes | Todo Camionetas</title>
+    
+    <meta property="og:title" content="Nuestros Clientes | Todo Camionetas">
+    <meta property="og:description" content="Mirá las últimas entregas y clientes felices que confiaron en nosotros para llegar a su nueva camioneta.">
+    <meta property="og:image" content="https://blblkcalqkdkbxocbrfo.supabase.co/storage/v1/object/public/fotos_vehiculos/tarjeta.png">
+    <meta property="og:type" content="website">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .titulo-clientes { color: #111827; font-size: 2.5rem; font-family: 'Poppins', sans-serif; font-weight: 800; text-align: center; margin-bottom: 5px; letter-spacing: -1px; }
+        .subtitulo-clientes { text-align: center; color: #6B7280; margin-bottom: 40px; font-size: 1.05rem; }
+
+        .grilla-4-columnas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; width: 100%; }
+
+        .tarjeta-entrega { background: white; border: 1px solid #E5E7EB; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s, border 0.3s, box-shadow 0.3s; }
+        .tarjeta-entrega:target { border: 2px solid #DC2626 !important; box-shadow: 0 0 20px rgba(220, 38, 38, 0.4) !important; transform: scale(1.02); }
+        
+        .img-entrega { width: 100%; height: 200px; object-fit: cover; }
+        .info-entrega { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; }
+        .titulo-entrega { margin: 0 0 8px 0; font-size: 1.15rem; color: #111827; line-height: 1.2; word-wrap: break-word; }
+        .fecha-entrega { font-size: 0.85rem; color: #6B7280; font-weight: bold; margin-bottom: 5px; }
+        .desc-entrega { font-size: 0.9rem; color: #4B5563; margin-top: 5px; line-height: 1.4; flex-grow: 1; word-wrap: break-word; }
+
+        .btn-compartir { background: #F3F4F6; color: #111827; border: 1px solid #D1D5DB; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 10px; transition: all 0.2s; font-family: 'Poppins', sans-serif; width: 100%; box-sizing: border-box; }
+        .btn-compartir:hover { background: #FEF2F2; color: #DC2626; border-color: #DC2626; }
+
+        .modal-compartir-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-compartir-caja { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 350px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+        .btn-red-social { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 8px; color: white; text-decoration: none; font-weight: 700; font-family: 'Poppins', sans-serif; margin-bottom: 10px; transition: transform 0.2s; border: none; width: 100%; cursor: pointer; box-sizing: border-box; }
+        .btn-red-social:hover { transform: scale(1.02); }
+
+        @media (max-width: 1100px) { .grilla-4-columnas { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+        @media (max-width: 850px) { .grilla-4-columnas { grid-template-columns: repeat(3, 1fr); gap: 15px; } }
+        @media (max-width: 550px) { 
+            .titulo-clientes { font-size: 1.7rem; }
+            .subtitulo-clientes { font-size: 0.85rem; margin-bottom: 25px; }
+            .grilla-4-columnas { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .tarjeta-entrega { border-radius: 8px; }
+            .img-entrega { height: 90px; } 
+            .info-entrega { padding: 8px; }
+            .titulo-entrega { font-size: 0.75rem; margin-bottom: 4px; }
+            .fecha-entrega { font-size: 0.65rem; margin-bottom: 3px; }
+            .desc-entrega { font-size: 0.65rem; line-height: 1.2; margin-top: 3px; }
+            .btn-compartir { font-size: 0.65rem; padding: 4px; margin-top: 8px; gap: 3px; border-radius: 4px; }
+        }
+    </style>
+
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="contenedor nav-container">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <img src="img/logo-todocam.png" alt="Todo Camionetas" style="height: 50px; object-fit: contain;">
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="index.html#seccion-inventario">0 KM / USADOS</a></li>
+                <li><a href="nosotros.html">¿QUIÉNES SOMOS?</a></li>
+                <li><a href="clientes.html">CLIENTES</a></li>
+                <li><a href="#footer-contacto">CONTACTO</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="contenedor" style="min-height: 60vh; padding-top: 30px; margin-bottom: 60px;">
+        <h2 class="titulo-clientes">Nuestros Clientes Felices</h2>
+        <p class="subtitulo-clientes">Gracias por elegirnos para llegar a tu próxima pick-up.</p>
+        
+        <div id="grilla-entregas-publica" class="grilla-4-columnas">
+            <p style="text-align: center; grid-column: 1/-1; color: #6B7280; font-size: 1.1rem; padding: 40px;">
+                Cargando entregas...
+            </p>
+        </div>
+    </main>
+
+    <footer class="footer" id="footer-contacto" style="background: #111827;">
+        <div class="contenedor footer-grid">
+            <div class="footer-columna">
+                <h3>Todo Camionetas</h3>
+                <p>Tu próxima pick-up te está esperando. Calidad, confianza y la mejor financiación del mercado para que te lleves la llave hoy mismo.</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Contacto Directo</h3>
+                <p>📍 Av. Republica del Libano Sur, Ciudad de La Banda</p>
+                <p>📱 WhatsApp: +5438500000</p>
+                <p>✉️ info@todocamionetas.com.ar</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Horarios de Atención</h3>
+                <p>Lunes a Viernes: 09:00 a 13:00 y 17:00 a 20:30 hs</p>
+                <p>Sábados: 09:00 a 13:00 hs</p>
+            </div>
+            <div class="footer-columna">
+                <h3>Redes Sociales</h3>
+                <a href="https://facebook.com" target="_blank" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; margin-bottom: 15px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook" style="width: 22px; height: 22px; object-fit: contain;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Facebook</span>
+                </a>
+                <a href="https://instagram.com" target="_blank" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; margin-bottom: 15px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram" style="width: 22px; height: 22px; object-fit: contain;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Instagram</span>
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Todo Camionetas. Todos los derechos reservados. Desarrollado por Goall Web Solutions.</p>
+        </div>
+    </footer>
+
+    <div class="redes-flotantes">
+        <a href="https://wa.me/5438500000" target="_blank" class="btn-flotante whatsapp" title="Contactar por WhatsApp">
+            <img src="https://cdn.simpleicons.org/whatsapp/white" alt="WhatsApp" class="logo-blanco">
+        </a>
+        <a href="https://instagram.com/" target="_blank" class="btn-flotante instagram" title="Seguir en Instagram">
+            <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram" class="logo-blanco">
+        </a>
+        <a href="https://facebook.com/" target="_blank" class="btn-flotante facebook" title="Seguir en Facebook">
+            <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook" class="logo-blanco">
+        </a>
+    </div>
+
+    <div id="modal-compartir" class="modal-compartir-fondo">
+        <div class="modal-compartir-caja">
+            <button onclick="document.getElementById('modal-compartir').style.display='none'" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #6B7280;">&times;</button>
+            <h3 style="margin: 5px 0 15px 0; color: #111827; font-family: 'Poppins', sans-serif;">Compartir Entrega</h3>
+            <a id="btn-share-wpp" href="#" target="_blank" class="btn-red-social" style="background: #25D366;">
+                <img src="https://cdn.simpleicons.org/whatsapp/white" alt="WhatsApp" style="width: 20px; height: 20px;"> Enviar por WhatsApp
+            </a>
+            <a id="btn-share-fb" href="#" target="_blank" class="btn-red-social" style="background: #1877F2;">
+                <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook" style="width: 20px; height: 20px;"> Publicar en Facebook
+            </a>
+            <button id="btn-copy-link" class="btn-red-social" style="background: #4B5563; border: none; width: 100%; cursor: pointer;">
+                🔗 Copiar Enlace
+            </button>
+            <p id="msj-copiado" style="display: none; color: #10B981; font-weight: bold; font-size: 0.85rem; margin-top: 10px;">¡Enlace copiado al portapapeles!</p>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grillaPublica = document.getElementById('grilla-entregas-publica');
+            if (!grillaPublica) return;
+
+            try {
+                const { data: entregas, error } = await clienteSupabase.from('entregas').select('*').order('id', { ascending: false });
+                if (error) throw error;
+                grillaPublica.innerHTML = '';
+
+                if (entregas.length === 0) {
+                    grillaPublica.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #6B7280; font-size: 1.1rem;">Próximamente verás aquí las entregas a nuestros clientes.</p>';
+                    return;
+                }
+
+                entregas.forEach(entrega => {
+                    const fechaTexto = entrega.fecha ? new Date(entrega.fecha).toLocaleDateString('es-AR') : '';
+                    let htmlFecha = fechaTexto ? `<div class="fecha-entrega">📅 ${fechaTexto}</div>` : '';
+                    let htmlDesc = entrega.descripcion ? `<p class="desc-entrega">${entrega.descripcion}</p>` : '';
+                    
+                    const div = document.createElement('div');
+                    div.className = 'tarjeta-entrega';
+                    div.id = `entrega-${entrega.id}`;
+                    div.onmouseover = () => { if(!window.location.hash.includes(`entrega-${entrega.id}`)) div.style.transform = 'translateY(-5px)'; };
+                    div.onmouseout = () => { if(!window.location.hash.includes(`entrega-${entrega.id}`)) div.style.transform = 'translateY(0)'; };
+
+                    div.innerHTML = `
+                        <img src="${entrega.url_imagen}" alt="Entrega ${entrega.titulo}" class="img-entrega" loading="lazy">
+                        <div class="info-entrega">
+                            <h3 class="titulo-entrega">${entrega.titulo}</h3>
+                            ${htmlFecha}
+                            ${htmlDesc}
+                            <button onclick="abrirModalCompartir('${entrega.titulo}', '${entrega.id}')" class="btn-compartir">📤 Compartir</button>
+                        </div>
+                    `;
+                    grillaPublica.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error cargando clientes:', error);
+                grillaPublica.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #EF4444; font-weight: bold;">No se pudieron cargar las entregas. Actualizá la página.</p>';
+            }
+        });
+
+        window.abrirModalCompartir = function(titulo, id) {
+            const urlCompartir = `${window.location.origin}${window.location.pathname}#entrega-${id}`;
+            const textoCompartir = `¡Mirá esta nueva entrega de ${titulo} en Todo Camionetas! 🚗✨`;
+            document.getElementById('btn-share-wpp').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoCompartir + '\n\n' + urlCompartir)}`;
+            document.getElementById('btn-share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(urlCompartir)}`;
+            const btnCopy = document.getElementById('btn-copy-link');
+            const msjCopiado = document.getElementById('msj-copiado');
+            msjCopiado.style.display = 'none';
+
+            btnCopy.onclick = async function() {
+                try {
+                    await navigator.clipboard.writeText(`${textoCompartir}\n${urlCompartir}`);
+                    msjCopiado.style.display = 'block';
+                } catch (err) { alert(`No se pudo copiar automáticamente. Copiá este enlace:\n\n${urlCompartir}`); }
+            };
+            document.getElementById('modal-compartir').style.display = 'flex';
+        };
+    </script>
+</body>
+</html>
